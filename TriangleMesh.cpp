@@ -73,7 +73,11 @@ bool TriangleMesh::intersect(const Ray &ray,
 
     Triangle tri(P[triangles_index[0]], P[triangles_index[1]], P[triangles_index[2]]);
     //Loop over all the triangles in the mesh and store the closest intersection point 
+    
     for(int i = 0; i < num_triangles; ++i) {
+        tri.v0 = P[triangles_index[j]];
+        tri.v1 = P[triangles_index[j + 1]];
+            tri.v2 = P[triangles_index[j + 2]];
         float t, u, v = infinity;
         if(tri.intersect(ray, t, u, v) && t < t_near) {
             t_near = t;     //the intersection distance
@@ -82,12 +86,10 @@ bool TriangleMesh::intersect(const Ray &ray,
             tri_index = i;  //which triangle is hit
             intersect = true;
         }
-
+    
         //next triangle
         j += 3;             
-        tri.v0 = P[triangles_index[j]];
-        tri.v1 = P[triangles_index[j + 1]];
-        tri.v2 = P[triangles_index[j + 2]];
+        
     }
     return intersect;
 }
