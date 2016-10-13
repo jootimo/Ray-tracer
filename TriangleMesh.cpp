@@ -1,5 +1,6 @@
 #include <limits>
 #include "TriangleMesh.h"
+#include "Atomics.h"
 
 const float infinity = std::numeric_limits<float>::max();
 
@@ -26,7 +27,9 @@ TriangleMesh::TriangleMesh(
         k += face_index[i];
     }
     max_vert_index += 1;
-    
+    std::cout << "Generating mesh with " << num_triangles << " triangles." << std::endl;
+    std::atomic_fetch_add(&num_total_triangles, (uint32_t) num_triangles);
+
     //Allocate memory for positions of the mesh vertices
     P = std::unique_ptr<Vec3<float> []>(new Vec3<float>[max_vert_index]);
     for(int i = 0; i < max_vert_index; ++i) {
@@ -58,8 +61,6 @@ TriangleMesh::TriangleMesh(
         }
         k += face_index[i];
     }
-    
-    std::cout << "Generating mesh with " << num_triangles << " triangles." << std::endl;
 }
 
 bool TriangleMesh::intersect(const Ray &ray,
@@ -69,9 +70,10 @@ bool TriangleMesh::intersect(const Ray &ray,
 {
     int j = 0;
     bool intersect = false;
+
+    Triangle tri(P[triangles_index[0]], P[triangles_index[1]], P[triangles_index[2]]);
     //Loop over all the triangles in the mesh and store the closest intersection point 
     for(int i = 0; i < num_triangles; ++i) {
-        Triangle tri(P[triangles_index[j]], P[triangles_index[j + 1]], P[triangles_index[j + 2]]);
         float t, u, v = infinity;
         if(tri.intersect(ray, t, u, v) && t < t_near) {
             t_near = t;     //the intersection distance
@@ -80,7 +82,12 @@ bool TriangleMesh::intersect(const Ray &ray,
             tri_index = i;  //which triangle is hit
             intersect = true;
         }
-        j += 3;             //next triangle
+
+        //next triangle
+        j += 3;             
+        tri.v0 = P[triangles_index[j]];
+        tri.v1 = P[triangles_index[j + 1]];
+        tri.v2 = P[triangles_index[j + 2]];
     }
     return intersect;
 }

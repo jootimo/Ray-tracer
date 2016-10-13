@@ -14,8 +14,13 @@
 #include "TriangleMesh.h"
 #include "DistantLight.h"
 #include "PointLight.h"
+#include "Atomics.h"
 
 const float infinity = std::numeric_limits<float>::max();
+std::atomic<uint32_t> num_ray_triangle_tests;
+std::atomic<uint32_t> num_ray_triangle_isects;
+std::atomic<uint32_t> num_primary_rays;
+std::atomic<uint32_t> num_total_triangles;
 
 struct Options {
     int img_width;
@@ -109,7 +114,6 @@ Vec3<float> cast_ray(const Ray &ray,
     }
 
     return hit_color;
-    
 }
 
 
@@ -139,6 +143,7 @@ void render(const Options &options,
             float pixelCAM_y = pixelSCR_y * tan(deg_to_rad(options.fov * 0.5));
 
             //Construct and cast ray for each pixel in frame
+            std::atomic_fetch_add(&num_primary_rays, (uint32_t) 1);
             Ray ray;
             ray.origin = orig;
             ray.direction = options.camera_to_world.multDirMatrix(Vec3<float>(pixelCAM_x, pixelCAM_y, -1)); //z = -1 means forward
@@ -146,7 +151,7 @@ void render(const Options &options,
             *(framebuffer++) = cast_ray(ray, objects, lights, options);
         }
     }
-    
+
 
     //Output into a .ppm file
     std::ofstream ofs("./out1.ppm", std::ios::out | std::ios::binary);
@@ -183,7 +188,7 @@ int main(int argc, char **argv)
     std::vector<std::unique_ptr<Object>> objects;
     std::vector<std::unique_ptr<Light>> lights;
 
-    TriangleMesh *mesh = generate_sphere_mesh(4, 17);
+    TriangleMesh *mesh = generate_sphere_mesh(4, 6);
     //Sphere *s1 = new Sphere(6, Vec3<float>(-8, -2, -8), Vec3<float>(0.2, 0.8, 0.5));
     //Sphere *s2 = new Sphere(3, Vec3<float>(-8, -2, 6), Vec3<float>(0.2, 0.8, 0.5));
     //Sphere *s3 = new Sphere(2, Vec3<float>(2, 2, 6), Vec3<float>(0.2, 0.8, 0.5));
@@ -210,7 +215,7 @@ int main(int argc, char **argv)
     lights.push_back(std::unique_ptr<Light>(dl));
     
 
-    int num_spheres = 12;
+    int num_spheres = 0;
     for(int i = 0; i < num_spheres; i++) {
         Vec3<float> random_pos((0.5 - dis(gen)) * 30, (0.5 - dis(gen)) * 30, (0.5 - dis(gen)) * 30);
         float random_rad = ((0.5 - dis(gen)) * 5);
@@ -227,6 +232,10 @@ int main(int argc, char **argv)
     end = std::chrono::system_clock::now();
     std::chrono::duration<double> duration = end - start;
 
+    std::cout << "Triangles: " << num_total_triangles << std::endl;
+    std::cout << "Primary rays: " << num_primary_rays << std::endl;
+    std::cout << "Ray-triangle tests: " << num_ray_triangle_tests << std::endl;
+    std::cout << "Ray-triangle intersections: " << num_ray_triangle_isects << std::endl;
     std::cout << "Scene rendered in " << duration.count() << " seconds." << std::endl;
 
     return 0;
