@@ -1,7 +1,7 @@
 #ifndef _OBJECT_H_
 #define _OBJECT_H_
 
-#include "Ray.h"
+#include "../Ray.h"
 
 //Base class for objects in a scene
 class Object {

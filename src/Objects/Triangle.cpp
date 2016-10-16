@@ -1,5 +1,5 @@
 #include "Triangle.h"
-#include "Atomics.h"
+#include "../Atomics.h"
 
 //Do ignore the triangles hit in the backside?
 const bool backface_culling = true;
@@ -22,7 +22,7 @@ Triangle::Triangle(const Vec3<float> &a, const Vec3<float> &b, const Vec3<float>
 //https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 bool Triangle::intersect(const Ray &ray, float &t, float &u, float &v)
 {
-    std::atomic_fetch_add(&num_ray_triangle_tests, 1);
+    std::atomic_fetch_add(&num_ray_triangle_tests, (uint32_t) 1);
     //Vectors that determine the triangles edges
     Vec3<float> v0v1 = v1 - v0;
     Vec3<float> v0v2 = v2 - v0;
@@ -58,7 +58,7 @@ bool Triangle::intersect(const Ray &ray, float &t, float &u, float &v)
     }
 
     t = v0v2.dot_product(qvec) * inverse_det;
-    std::atomic_fetch_add(&num_ray_triangle_isects, 1);
+    std::atomic_fetch_add(&num_ray_triangle_isects, (uint32_t) 1);
 
     return true;
 }

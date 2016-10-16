@@ -1,7 +1,7 @@
 #ifndef _SPHERE_H_
 #define _SPHERE_H_
 
-#include "Math.h"
+#include "../Math.h"
 #include "TriangleMesh.h"
 
 class Sphere : public Object {

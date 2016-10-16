@@ -1,19 +1,15 @@
-#include <iostream>
-#include <cmath>
+
 #include <fstream>
 #include <chrono>
-#include <vector>
-#include <memory>
 #include <random>
-#include <limits>
 #include "Math.h"
 #include "Ray.h"
-#include "Object.h"
-#include "Sphere.h"
-#include "Triangle.h"
-#include "TriangleMesh.h"
-#include "DistantLight.h"
-#include "PointLight.h"
+#include "Objects/Object.h"
+#include "Objects/Sphere.h"
+#include "Objects/Triangle.h"
+#include "Objects/TriangleMesh.h"
+#include "Lights/DistantLight.h"
+#include "Lights/PointLight.h"
 #include "Atomics.h"
 
 const float infinity = std::numeric_limits<float>::max();
@@ -59,7 +55,7 @@ bool trace(const Ray &ray,
         int index_triangle;
         Vec2<float> uv_triangle;
 
-        
+
         if(objects[i]->intersect(ray, t_near_triangle, index_triangle, uv_triangle)
                 && t_near_triangle < info.t_near) {
 
@@ -169,8 +165,8 @@ void render(const Options &options,
 int main(int argc, char **argv)
 {
     Options options;
-    options.img_width = 640;
-    options.img_height = 480;
+    options.img_width = 1920;
+    options.img_height = 1080;
     options.fov = 51.52;
     options.camera_to_world = Matrix44<float>(0.945519, 0, -0.325569, 0, -0.179534, 0.834209, -0.521403, 0, 0.271593, 0.551447, 0.78876, 0, 4.208271, 8.374532, 17.932925, 1);
     options.background_color = Vec3<float>(0.2, 0.6, 0.8);
@@ -215,7 +211,7 @@ int main(int argc, char **argv)
     lights.push_back(std::unique_ptr<Light>(dl));
     
 
-    int num_spheres = 0;
+    int num_spheres = 6;
     for(int i = 0; i < num_spheres; i++) {
         Vec3<float> random_pos((0.5 - dis(gen)) * 30, (0.5 - dis(gen)) * 30, (0.5 - dis(gen)) * 30);
         float random_rad = ((0.5 - dis(gen)) * 5);

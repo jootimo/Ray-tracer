@@ -2,7 +2,7 @@
 #define _TRIANGLEMESH_H_
 
 #include <memory>
-#include "Math.h"
+#include "../Math.h"
 #include "Object.h"
 #include "Triangle.h"
 

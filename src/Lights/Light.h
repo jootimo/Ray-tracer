@@ -1,7 +1,7 @@
 #ifndef _LIGHT_H_
 #define _LIGHT_H_
 
-#include "Math.h"
+#include "../Math.h"
 
 class Light {
 public:

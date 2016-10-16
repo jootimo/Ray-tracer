@@ -1,4 +1,4 @@
-#include "../Math.h"
+#include "../src/Math.h"
 
 template <class T>
 void expect(T value, T expected)

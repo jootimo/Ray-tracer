@@ -1,6 +1,6 @@
 #include <limits>
 #include "TriangleMesh.h"
-#include "Atomics.h"
+#include "../Atomics.h"
 
 const float infinity = std::numeric_limits<float>::max();
 

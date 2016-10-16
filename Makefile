@@ -1,11 +1,31 @@
-CXXFLAGS  = -Wall  -std=c++11
+CXXFLAGS=-c -Wall  -std=c++11
+LDFLAGS=
+CC = g++
 
-all: Tracer
+SOURCEDIR = src
 
-test: Test/Test_Math
+EXECUTABLE = Tracer
+TEST = Tests
 
-Tracer: Math.o Ray.o Sphere.o Triangle.o TriangleMesh.o 
+SOURCES=$(wildcard $(SOURCEDIR)/**/*.cpp $(SOURCEDIR)/*.cpp)
+OBJECTS=$(SOURCES:.cpp=.o)
+#OBJECTS=$(patsubst $(SOURCEDIR)/%.cpp $(SOURCEDIR)/**/%.cpp,$(BUILDDIR)/%.o,$(SOURCES))
 
-Test/Test_Math: Math.o
+TEST_SRC=$(wildcard test/*.cpp)
+TESTS_OBJ=$(TEST_SRC:.cpp=.o src/Math.o)
 
-clean: ;rm Tracer Test/Test_Math *.o *.ppm
+all: $(EXECUTABLE)
+
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+
+.cpp.o:
+	$(CC) $(CXXFLAGS) $< -o $@
+
+test: $(TEST)
+
+$(TEST): $(TESTS_OBJ)
+	$(CC) $(LDFLAGS) $(TESTS_OBJ) -o $@
+
+clean:
+	rm Tracer Tests *.ppm src/*.o src/**/*.o test/*.o
