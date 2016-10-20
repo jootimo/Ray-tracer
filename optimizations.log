@@ -1,0 +1,27 @@
+Run on a 3.4GHz processor, in a virtual machine.
+
+initially: 1920*1080 pixels, 1 sphere of 60 triangles, 6 implicit spheres
+
+	Triangles: 60
+	Primary rays: 2073600
+	Ray-triangle tests: 199895400
+	Ray-triangle intersections: 294113
+	Scene rendered in 38.8222 seconds.
+
+multithreading: 1920*1080 pixels, 1 sphere of 60 triangles, 6 implicit spheres
+	
+	Triangles: 60
+	Primary rays: 2073600
+	Ray-triangle tests: 199895400
+	Ray-triangle intersections: 294116
+
+	4 threads:
+	Scene rendered in 14.8 seconds. (AVG)
+	T_old/T_new = 2.62162... => 2.6x speedup
+
+	8 threads:
+	Scene rendered in 12.02 seconds. (AVG)
+	T_old/T_new = 3.180... => 3.2x speedup
+	
+	
+
