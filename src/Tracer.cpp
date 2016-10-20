@@ -2,6 +2,7 @@
 #include <fstream>
 #include <chrono>
 #include <random>
+#include <thread>
 #include "Math.h"
 #include "Ray.h"
 #include "Objects/Object.h"
@@ -25,6 +26,7 @@ struct Options {
     Matrix44<float> camera_to_world;
     Vec3<float> background_color;
     float shadow_bias; //a small value that is used to eliminate shadow acne
+    int num_threads;
 };
 
 struct Intersect_info {
@@ -44,9 +46,26 @@ inline float deg_to_rad(const float &deg)
 { return deg * M_PI / 180; }
  
 
+//Output into a .ppm file
+void draw(Options options, Vec3<float> *framebuffer)
+{
+    Vec3<float> *pixels = framebuffer;
+    std::ofstream ofs("./out1.ppm", std::ios::out | std::ios::binary);
+    ofs << "P6\n" << options.img_width << " " << options.img_height << "\n255\n";
+    
+    for (int i = 0; i < options.img_height * options.img_width; ++i) {
+        char r = (char)(255 * clamp(0, 1, pixels[i].x));
+        char g = (char)(255 * clamp(0, 1, pixels[i].y));
+        char b = (char)(255 * clamp(0, 1, pixels[i].z));
+        ofs << r << g << b;
+    }
+    ofs.close();
+}
+
+
 //return true if and object is hit
 bool trace(const Ray &ray, 
-           const std::vector<std::unique_ptr<Object>> &objects,
+           const std::vector<Object *> &objects,
            Intersect_info &info)
 {
     info.hit_object = nullptr;
@@ -60,7 +79,7 @@ bool trace(const Ray &ray,
                 && t_near_triangle < info.t_near) {
 
             //if an intersection is found and it is closer than the closest intersection
-            info.hit_object = objects[i].get();
+            info.hit_object = objects[i];
             info.t_near = t_near_triangle;
             info.index = index_triangle;
             info.uv = uv_triangle;
@@ -73,8 +92,8 @@ bool trace(const Ray &ray,
 
 
 Vec3<float> cast_ray(const Ray &ray,
-                     const std::vector<std::unique_ptr<Object>> &objects,
-                     const std::vector<std::unique_ptr<Light>> &lights,
+                     const std::vector<Object *> &objects,
+                     const std::vector<Light *> &lights,
                      const Options &options)
 {
     Vec3<float> hit_color = Vec3<float>(0);
@@ -113,19 +132,16 @@ Vec3<float> cast_ray(const Ray &ray,
 }
 
 
-
 void render(const Options &options,
-            const std::vector<std::unique_ptr<Object>> &objects,
-            const std::vector<std::unique_ptr<Light>> &lights)
+            const std::vector<Object *> &objects,
+            const std::vector<Light *> &lights,
+            Vec3<float> *framebuffer,
+            Vec3<float> orig,
+            float aspect_ratio,
+            int row_start,
+            int row_end)
 {
-    std::cout << "Rendering..." << std::endl; 
-    float aspect_ratio = options.img_width / (float) options.img_height;
-    Vec3<float> *framebuffer = new Vec3<float>[options.img_width * options.img_height];
-    Vec3<float> *pixels = framebuffer;
-    Vec3<float> orig;
-    orig = options.camera_to_world.multVecMatrix(Vec3<float>());
-
-    for(int j = 0; j < options.img_height; ++j) {
+    for(int j = row_start; j < row_end; ++j) {
         for(int i = 0; i < options.img_width; ++i) {
             //Normalized Device Coordinates in range [0, 1]
             float pixelNDC_x = (i + 0.5) / (float)options.img_width;
@@ -143,34 +159,56 @@ void render(const Options &options,
             Ray ray;
             ray.origin = orig;
             ray.direction = options.camera_to_world.multDirMatrix(Vec3<float>(pixelCAM_x, pixelCAM_y, -1)); //z = -1 means forward
-            ray.direction.normalize();            
-            *(framebuffer++) = cast_ray(ray, objects, lights, options);
+            ray.direction.normalize();  
+
+            framebuffer[j * options.img_width + i] = cast_ray(ray, objects, lights, options);
         }
     }
 
-
-    //Output into a .ppm file
-    std::ofstream ofs("./out1.ppm", std::ios::out | std::ios::binary);
-    ofs << "P6\n" << options.img_width << " " << options.img_height << "\n255\n";
     
-    for (int i = 0; i < options.img_height * options.img_width; ++i) {
-        char r = (char)(255 * clamp(0, 1, pixels[i].x));
-        char g = (char)(255 * clamp(0, 1, pixels[i].y));
-        char b = (char)(255 * clamp(0, 1, pixels[i].z));
-        ofs << r << g << b;
-    }
-    ofs.close();
 }
+
+//initialize threads and start rendering
+void init_rendering(const Options &options,
+                const std::vector<Object *> &objects,
+                const std::vector<Light *> &lights)
+{
+
+    float aspect_ratio = options.img_width / (float) options.img_height;
+    Vec3<float> *framebuffer = new Vec3<float>[options.img_width * options.img_height];
+    
+    Vec3<float> orig;
+    orig = options.camera_to_world.multVecMatrix(Vec3<float>());
+
+    std::thread threads[options.num_threads];
+    int row_start, row_end;
+    for(int i = 0; i < options.num_threads; i++) {
+        row_start = i * options.img_height / options.num_threads;
+        row_end = (i + 1) * options.img_height / options.num_threads;
+        std::cout << "Started thread " << i << ", rendering rows " << row_start << "-" << row_end - 1 << "..." << std::endl;
+        threads[i] = std::thread(render, options, objects, lights, framebuffer, orig, aspect_ratio, row_start, row_end);  
+    }
+    
+    for(int i = 0; i < options.num_threads; i++) {
+        threads[i].join();
+    }
+
+    draw(options, framebuffer);
+
+    delete[](framebuffer);
+}
+
 
 int main(int argc, char **argv)
 {
     Options options;
-    options.img_width = 1920;
-    options.img_height = 1080;
+    options.img_width = 640;
+    options.img_height = 480;
     options.fov = 51.52;
     options.camera_to_world = Matrix44<float>(0.945519, 0, -0.325569, 0, -0.179534, 0.834209, -0.521403, 0, 0.271593, 0.551447, 0.78876, 0, 4.208271, 8.374532, 17.932925, 1);
     options.background_color = Vec3<float>(0.2, 0.6, 0.8);
     options.shadow_bias = 0.001;
+    options.num_threads = 4;
 
     //initialize random generator
     std::random_device rnd;
@@ -180,15 +218,14 @@ int main(int argc, char **argv)
     gen.seed(0);
     
     //generate Scene
-    //unique_ptr is automatically deleted when it goes out of scope
-    std::vector<std::unique_ptr<Object>> objects;
-    std::vector<std::unique_ptr<Light>> lights;
+    std::vector<Object *> objects;
+    std::vector<Light *> lights;
 
     TriangleMesh *mesh = generate_sphere_mesh(4, 6);
     //Sphere *s1 = new Sphere(6, Vec3<float>(-8, -2, -8), Vec3<float>(0.2, 0.8, 0.5));
     //Sphere *s2 = new Sphere(3, Vec3<float>(-8, -2, 6), Vec3<float>(0.2, 0.8, 0.5));
     //Sphere *s3 = new Sphere(2, Vec3<float>(2, 2, 6), Vec3<float>(0.2, 0.8, 0.5));
-    objects.push_back(std::unique_ptr<Object>(mesh));
+    objects.push_back((mesh));
     //objects.push_back(std::unique_ptr<Object>(s1));
     //objects.push_back(std::unique_ptr<Object>(s2));
     //objects.push_back(std::unique_ptr<Object>(s3));
@@ -207,8 +244,8 @@ int main(int argc, char **argv)
     DistantLight *dl = new DistantLight(l_to_w1, Vec3<float>(0.6, 0.6, 1), 6);
     PointLight *pl = new PointLight(l_to_w2, Vec3<float>(1, 0.6, 0.6), 16); 
 
-    lights.push_back(std::unique_ptr<Light>(pl));        
-    lights.push_back(std::unique_ptr<Light>(dl));
+    lights.push_back(pl);        
+    lights.push_back(dl);
     
 
     int num_spheres = 6;
@@ -216,14 +253,14 @@ int main(int argc, char **argv)
         Vec3<float> random_pos((0.5 - dis(gen)) * 30, (0.5 - dis(gen)) * 30, (0.5 - dis(gen)) * 30);
         float random_rad = ((0.5 - dis(gen)) * 5);
         Vec3<float> color((float)(dis(gen)), (float)(dis(gen)), (float)(dis(gen)));
-        objects.push_back(std::unique_ptr<Object>(new Sphere(random_rad, random_pos, color)));
+        objects.push_back(new Sphere(random_rad, random_pos, color));
     }
     
     //Measure rendering time
     std::chrono::time_point<std::chrono::system_clock> start, end;
     start = std::chrono::system_clock::now();
 
-    render(options, objects, lights);
+    init_rendering(options, objects, lights);
 
     end = std::chrono::system_clock::now();
     std::chrono::duration<double> duration = end - start;
@@ -233,6 +270,13 @@ int main(int argc, char **argv)
     std::cout << "Ray-triangle tests: " << num_ray_triangle_tests << std::endl;
     std::cout << "Ray-triangle intersections: " << num_ray_triangle_isects << std::endl;
     std::cout << "Scene rendered in " << duration.count() << " seconds." << std::endl;
+
+    for(auto o : objects) {
+        delete(o);    
+    }
+    for(auto l : lights) {
+        delete(l);
+    }
 
     return 0;
 }

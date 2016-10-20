@@ -1,5 +1,5 @@
-CXXFLAGS=-c -Wall  -std=c++11
-LDFLAGS=
+CXXFLAGS=-c -Wall -std=c++11 
+LDFLAGS= -lpthread
 CC = g++
 
 SOURCEDIR = src
@@ -17,7 +17,7 @@ TESTS_OBJ=$(TEST_SRC:.cpp=.o src/Math.o)
 all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ 
 
 .cpp.o:
 	$(CC) $(CXXFLAGS) $< -o $@
