@@ -10,7 +10,7 @@ void expect(T value, T expected)
     }
 }
 
-int main(int argc, char **argv)
+int test_math(int argc, char **argv)
 {
     float x = 0;
     float y = 0;

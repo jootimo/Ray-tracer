@@ -2,6 +2,12 @@
 #include <memory>
 #include "Sphere.h"
 
+//M_PI is undefined in Windows
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+
 Sphere::Sphere(const float &radius, const Vec3<float> &center, const Vec3<float> &color)
 {
     this->radius = radius;
@@ -67,7 +73,7 @@ TriangleMesh* generate_sphere_mesh(float rad, int divisions)
     std::unique_ptr<Vec3<float> []> N(new Vec3<float>[num_vertices]);
     std::unique_ptr<Vec2<float> []> tex(new Vec2<float>[num_vertices]);
     
-    float u = -M_PI_2;
+    float u = -M_PI/2;
     float v = -M_PI;
     float du = M_PI / divisions;
     float dv = 2 * M_PI / divisions;

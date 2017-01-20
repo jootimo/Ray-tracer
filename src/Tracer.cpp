@@ -3,6 +3,7 @@
 #include <chrono>
 #include <random>
 #include <thread>
+#include <algorithm>
 #include "Math.h"
 #include "Ray.h"
 #include "Objects/Object.h"
@@ -180,7 +181,7 @@ void init_rendering(const Options &options,
     Vec3<float> orig;
     orig = options.camera_to_world.multVecMatrix(Vec3<float>());
 
-    std::thread threads[options.num_threads];
+    std::thread* threads = new std::thread[options.num_threads];
     int row_start, row_end;
     for(int i = 0; i < options.num_threads; i++) {
         row_start = i * options.img_height / options.num_threads;
@@ -192,9 +193,9 @@ void init_rendering(const Options &options,
     for(int i = 0; i < options.num_threads; i++) {
         threads[i].join();
     }
+	delete[](threads);
 
     draw(options, framebuffer);
-
     delete[](framebuffer);
 }
 

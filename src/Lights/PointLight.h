@@ -3,6 +3,11 @@
 
 #include "Light.h"
 
+//M_PI is undefined in Windows
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 class PointLight : public Light {
 public:
     PointLight(const Matrix44<float> l_to_w, 
