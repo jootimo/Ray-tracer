@@ -1,5 +1,4 @@
-#ifndef _RAY_H_
-#define _RAY_H_
+#pragma once
 
 #include "Math.h"
 
@@ -12,5 +11,3 @@ public:
     Ray();
     Ray(const Vec3<float> &orig, const Vec3<float> &dir, RayType r_type);
 };
-
-#endif 

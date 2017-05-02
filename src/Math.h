@@ -1,5 +1,5 @@
-#ifndef _MATH_H_
-#define _MATH_H_
+#pragma once
+
 #include <iostream>
 
 //A class for vectors of lenght 3. Can also simulate a point in 3 space
@@ -68,5 +68,3 @@ template <class T> Vec3<T> mult_number_Vec3(const T &n, const Vec3<T> &vec)
 //Divide number by Vec3
 template <class T> Vec3<T> div_number_Vec3(const T &n, const Vec3<T> &vec)
 { return Vec3<T>(n / vec.x, n / vec.y, n / vec.z); }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _DISTANTLIGHT_H_
-#define _DISTANTLIGHT_H_
+#pragma once
 
 #include <limits>
 #include "Light.h"
@@ -26,5 +25,3 @@ public:
         distance = std::numeric_limits<int>::max(); 
     }
 };
-
-#endif

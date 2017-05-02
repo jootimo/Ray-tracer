@@ -1,5 +1,4 @@
-#ifndef _TRIANGLEMESH_H_
-#define _TRIANGLEMESH_H_
+#pragma once
 
 #include <memory>
 #include "../Math.h"
@@ -40,5 +39,3 @@ public:
     
 
 };
-
-#endif

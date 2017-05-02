@@ -1,23 +1,15 @@
-#include <cmath>
+
 #include "Math.h"
 
 
 template <class T> Vec3<T>::Vec3()
-{
-    this-> x = this-> y = this-> z = 0;
-}
+	: x{ 0 }, y{ 0 }, z{ 0 } {}
 
-template <class T> Vec3<T>::Vec3(T n)
-{
-    this-> x = this-> y = this-> z = n;
-}
+template <class T> Vec3<T>::Vec3(T n) 
+	: x{ n }, y{ n }, z{ n } {}
 
 template <class T> Vec3<T>::Vec3(T x, T y, T z)
-{
-    this-> x = x; 
-    this-> y = y;
-    this-> z = z;
-}
+	: x{ x }, y{ y }, z{ z }  {}
 
 template <class T> Vec3<T> Vec3<T>::operator +(const Vec3 &vec) const
 {
@@ -46,7 +38,7 @@ template <class T> Vec3<T> Vec3<T>::operator *(const T &n) const
 
 template <class T> Vec3<T>& Vec3<T>::operator *=(const T &n) 
 {
-    x = x * n; y = y * n; z = z * n;
+    x *= n; y *= n; z *= n;
     return *this; 
 }
 

@@ -1,5 +1,4 @@
-#ifndef _TRIANGLE_H_
-#define _TRIANGLE_H_
+#pragma once
 
 #include "../Math.h"
 #include "../Ray.h"
@@ -13,5 +12,3 @@ public:
     //if found, the barycentric coordinates are stored in t, u and v. 
     bool intersect(const Ray &ray, float &t, float &u, float &v);
 };
-
-#endif

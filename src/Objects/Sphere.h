@@ -1,5 +1,4 @@
-#ifndef _SPHERE_H_
-#define _SPHERE_H_
+#pragma once
 
 #include "../Math.h"
 #include "TriangleMesh.h"
@@ -28,5 +27,3 @@ public:
 //Make a triangle mesh from a sphere. 
 //More divisions mean a better looking sphere
 TriangleMesh* generate_sphere_mesh(float rad, int divisions);
-
-#endif

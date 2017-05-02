@@ -64,7 +64,7 @@ void draw(Options options, Vec3<float> *framebuffer)
 }
 
 
-//return true if and object is hit
+//Return true if and object is hit
 bool trace(const Ray &ray, 
            const std::vector<Object *> &objects,
            Intersect_info &info)
@@ -91,7 +91,7 @@ bool trace(const Ray &ray,
     return (info.hit_object != nullptr); 
 }
 
-
+//Get colour of pixel
 Vec3<float> cast_ray(const Ray &ray,
                      const std::vector<Object *> &objects,
                      const std::vector<Light *> &lights,
@@ -132,7 +132,7 @@ Vec3<float> cast_ray(const Ray &ray,
     return hit_color;
 }
 
-
+//Render the scene into framebuffer
 void render(const Options &options,
             const std::vector<Object *> &objects,
             const std::vector<Light *> &lights,
@@ -169,7 +169,7 @@ void render(const Options &options,
     
 }
 
-//initialize threads and start rendering
+//Initialize threads, render, and draw picture
 void init_rendering(const Options &options,
                 const std::vector<Object *> &objects,
                 const std::vector<Light *> &lights)
@@ -209,7 +209,7 @@ int main(int argc, char **argv)
     options.camera_to_world = Matrix44<float>(0.945519, 0, -0.325569, 0, -0.179534, 0.834209, -0.521403, 0, 0.271593, 0.551447, 0.78876, 0, 4.208271, 8.374532, 17.932925, 1);
     options.background_color = Vec3<float>(0.2, 0.6, 0.8);
     options.shadow_bias = 0.001;
-    options.num_threads = 4;
+    options.num_threads = 8;
 
     //initialize random generator
     std::random_device rnd;
@@ -222,7 +222,7 @@ int main(int argc, char **argv)
     std::vector<Object *> objects;
     std::vector<Light *> lights;
 
-    TriangleMesh *mesh = generate_sphere_mesh(4, 6);
+    TriangleMesh *mesh = generate_sphere_mesh(4, 10);
     //Sphere *s1 = new Sphere(6, Vec3<float>(-8, -2, -8), Vec3<float>(0.2, 0.8, 0.5));
     //Sphere *s2 = new Sphere(3, Vec3<float>(-8, -2, 6), Vec3<float>(0.2, 0.8, 0.5));
     //Sphere *s3 = new Sphere(2, Vec3<float>(2, 2, 6), Vec3<float>(0.2, 0.8, 0.5));

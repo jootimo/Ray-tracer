@@ -1,11 +1,8 @@
+
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <memory>
 #include "Sphere.h"
-
-//M_PI is undefined in Windows
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
 
 
 Sphere::Sphere(const float &radius, const Vec3<float> &center, const Vec3<float> &color)

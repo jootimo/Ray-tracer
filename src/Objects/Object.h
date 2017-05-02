@@ -1,5 +1,4 @@
-#ifndef _OBJECT_H_
-#define _OBJECT_H_
+#pragma once
 
 #include "../Ray.h"
 
@@ -10,9 +9,7 @@ public:
     //In real world this is usually about 18%
     Vec3<float> albedo; 
     Object() 
-    {
-        this->albedo = Vec3<float>(0.18);
-    }
+		: albedo{ Vec3<float>(0.18) } {}
     virtual ~Object() {}    
     //Check if a ray intersects the object
     virtual bool intersect(const Ray &, float &, int &, Vec2<float> &) const = 0;
@@ -24,5 +21,3 @@ public:
                                   Vec3<float> &, 
                                   Vec2<float> &) const = 0; 
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _LIGHT_H_
-#define _LIGHT_H_
+#pragma once
 
 #include "../Math.h"
 
@@ -14,11 +13,7 @@ public:
     Light(const Matrix44<float> l_to_w, 
           const Vec3<float> &color,
           const float &intensity) 
-    {
-        this->light_to_world = l_to_w;
-        this->color = color;
-        this->intensity = intensity;
-    }
+			: light_to_world{ l_to_w }, color{ color }, intensity { intensity } {}
     virtual ~Light() {}
     virtual void illuminate(const Vec3<float> &point, 
                     Vec3<float> &, 
@@ -26,5 +21,3 @@ public:
                     float &) const = 0;
 
 };
-
-#endif

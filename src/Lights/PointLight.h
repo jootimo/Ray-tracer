@@ -1,12 +1,8 @@
-#ifndef _POINTLIGHT_H_
-#define _POINTLIGHT_H_
+#pragma once
 
+#define _USE_MATH_DEFINES //for M_PI in windows 
+#include <math.h>
 #include "Light.h"
-
-//M_PI is undefined in Windows
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
 
 class PointLight : public Light {
 public:
@@ -38,5 +34,3 @@ public:
         light_intensity = color * intensity / (4 * M_PI * dist_sq);
     }
 };
-
-#endif
