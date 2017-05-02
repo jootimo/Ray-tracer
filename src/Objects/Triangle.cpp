@@ -12,11 +12,7 @@ Triangle::Triangle()
 }
 
 Triangle::Triangle(const Vec3<float> &a, const Vec3<float> &b, const Vec3<float> &c)
-{
-    v0 = a;
-    v1 = b;
-    v2 = c;
-}
+    : v0{ a }, v1{ b }, v2{ c } {}
 
 //The Möller-Trumbore algorithm for fast intersection detection
 //https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm

@@ -6,12 +6,10 @@
 
 
 Sphere::Sphere(const float &radius, const Vec3<float> &center, const Vec3<float> &color)
-{
-    this->radius = radius;
-    this->radius2 = radius * radius;
-    this->center = center;
-    this->color = color;
-}
+    : radius{ radius },
+    radius2{ radius * radius },
+    center{ center },
+    color{ color } {}
 
 
 bool Sphere::intersect(const Ray &ray, float &t, int &, Vec2<float> &) const
